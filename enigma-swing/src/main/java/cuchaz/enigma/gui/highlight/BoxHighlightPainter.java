@@ -17,10 +17,12 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
+import javax.swing.text.LayeredHighlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import javax.swing.text.View;
 
-public class BoxHighlightPainter implements Highlighter.HighlightPainter {
+public class BoxHighlightPainter extends LayeredHighlighter.LayerPainter {
 	private Color fillColor;
 	private Color borderColor;
 
@@ -55,7 +57,29 @@ public class BoxHighlightPainter implements Highlighter.HighlightPainter {
 
 	@Override
 	public void paint(Graphics g, int start, int end, Shape shape, JTextComponent text) {
-		Rectangle bounds = getBounds(text, start, end);
+	}
+
+	@Override
+	public Shape paintLayer(Graphics g, int start, int end, Shape shape, JTextComponent text, View view) {
+		Rectangle bounds;
+
+		if (start == view.getStartOffset() && end == view.getEndOffset()) {
+			bounds = shape.getBounds();
+		} else {
+			try {
+				bounds = view.modelToView(start, Position.Bias.Forward,
+					end, Position.Bias.Backward,
+					shape).getBounds();
+			} catch (BadLocationException e) {
+				return null;
+			}
+		}
+
+		// adjust the box so it looks nice
+		bounds.x -= 2;
+		bounds.width += 2;
+		bounds.y += 1;
+		bounds.height -= 2;
 
 		// fill the area
 		if (this.fillColor != null) {
@@ -66,6 +90,8 @@ public class BoxHighlightPainter implements Highlighter.HighlightPainter {
 		// draw a box around the area
 		g.setColor(this.borderColor);
 		g.drawRoundRect(bounds.x, bounds.y, bounds.width, bounds.height, 4, 4);
+
+		return bounds;
 	}
 
 }
