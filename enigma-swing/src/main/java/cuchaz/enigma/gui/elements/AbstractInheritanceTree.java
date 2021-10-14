@@ -11,6 +11,8 @@ import javax.swing.tree.*;
 
 import cuchaz.enigma.analysis.ClassInheritanceTreeNode;
 import cuchaz.enigma.analysis.MethodInheritanceTreeNode;
+import cuchaz.enigma.analysis.ClassImplementationsTreeNode;
+import cuchaz.enigma.analysis.MethodImplementationsTreeNode;
 import cuchaz.enigma.gui.Gui;
 import cuchaz.enigma.gui.util.GuiUtil;
 import cuchaz.enigma.gui.util.SingleTreeSelectionModel;
@@ -51,6 +53,10 @@ public abstract class AbstractInheritanceTree {
 				if (methodNode.isImplemented()) {
 					gui.getController().navigateTo(methodNode.getMethodEntry());
 				}
+			} else if (node instanceof ClassImplementationsTreeNode classNode) {
+				gui.getController().navigateTo(classNode.getClassEntry());
+			} else if (node instanceof MethodImplementationsTreeNode methodNode) {
+				gui.getController().navigateTo(methodNode.getMethodEntry());
 			}
 		}
 	}
